@@ -1,6 +1,6 @@
 -
     name: Install list of packages (PHP, Supervisor, Nginx,...)
-    hosts: curso
+    hosts: all
     become: yes
     tasks:
         - name: Install required packages (curl, git, supervisor,...)
@@ -51,7 +51,7 @@
               update_cache: yes
 -
     name: Install Composer
-    hosts: curso
+    hosts: all
     become: yes
     tasks:
         - name: Download installer
@@ -63,14 +63,14 @@
 
 -
     name: Configure MySQL
-    hosts: curso
+    hosts: all
     become: yes
     ignore_errors: yes # una vez cambiado el password fallará la ejecución
     tasks:
       - name: Sets the root password
         mysql_user:
           name: root
-          password: "{{ mysql_root_password }}"
+          password: "1q2w3e4r5t6y"
           login_unix_socket: /var/run/mysqld/mysqld.sock
           state: present
           login_host: 'localhost'
@@ -82,17 +82,17 @@
           host_all: yes
           state: absent
           login_user: root
-          login_password: "{{ mysql_root_password }}"
+          login_password: ""
 
       - name: Removes the MySQL test database
         mysql_db:
           name: test
           state: absent
           login_user: root
-          login_password: "{{ mysql_root_password }}"
+          login_password: "1q2w3e4r5t6y"
 -
   name: Configure php.ini
-  hosts: curso
+  hosts: all
   become: yes
   tasks:
     - name: Set post_max_size
@@ -106,30 +106,8 @@
         regexp: "upload_max_filesize ="
         line: upload_max_filesize = 25M
 -
-    name: Configure Nginx
-    hosts: curso
-    become: yes
-    tasks:
-        - name: Copy nginx.conf
-          copy:
-            src: '{{ playbook_dir }}/nginx/nginx.conf'
-            dest: /etc/nginx/
-        - name: Copy site config
-          copy:
-              src: '{{ playbook_dir }}/nginx/my-site.com'
-              dest: /etc/nginx/sites-available
-        - name: Enable the site
-          file:
-            src: /etc/nginx/sites-available/my-site.com
-            dest: /etc/nginx/sites-enabled/my-site.com
-            state: link
-        - name: Restart Nginx
-          service:
-            name: nginx
-            state: restarted
--
   name: Ensure app dir is present and empty
-  hosts: curso
+  hosts: all
   become: yes
   tasks:
     - name: Ensure app dir is empty
@@ -141,11 +119,11 @@
         path: /srv/my_site
         state: directory
         mode: '0777'        
-        owner: "{{ admin_user }}"
-        group: "{{ admin_user }}"
+        owner: www-data
+        group: www-data
 -
   name: Deploy App code
-  hosts: curso
+  hosts: all
   become: no
   tasks:
     - name: Create project using Composer      
@@ -154,7 +132,7 @@
         chdir: /srv
 -
   name: Create logs directory
-  hosts: curso
+  hosts: all
   become: yes
   tasks:
     - name: Ensures /srv/my_site/var/log dir exists
@@ -162,21 +140,21 @@
         path: /srv/my_site/var/log
         state: directory
         mode: '0777'
-        owner: "{{ admin_user }}"
-        group: "{{ admin_user }}"
+        owner: www-data
+        group: www-data
 -
   name: Add  user to www-data group
-  hosts: curso
+  hosts: all
   become: yes
   tasks:
     - name: Add user to www-data group
       user:
-        name: "{{ admin_user }}"
+        name: www-data
         groups: www-data
         append: yes
 -
   name: Restart PHP-FPM to apply changes
-  hosts: curso
+  hosts: all
   become: yes
   tasks:
     - name: Restart PHP-FPM

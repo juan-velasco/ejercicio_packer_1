@@ -26,16 +26,16 @@ build {
     provisioner "shell" {
       inline = [
         "set -e #aborta el comando en caso de error",
-        "sudo timedatectl set-timezone Europe/Madrid"
+        "sudo timedatectl set-timezone Europe/Madrid",       
+        "sudo apt-get update -y",
+        "sudo apt-get install software-properties-common -y",
+        "sudo apt-add-repository ppa:ansible/ansible -y",
+        "sudo apt-get update -y",
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get install ansible -y"        
       ]
     }
 
-    provisioner "ansible" {    
+    provisioner "ansible-local" {    
       playbook_file = "provisioners/ansible/instalar_aplicacion.yml"
-      groups = ["curso"]
-      extra_arguments = [
-          "--extra-vars",
-          "mysql_root_password=1q2w3e4r5t6y admin_user=www-data"
-      ]
     }
 }
