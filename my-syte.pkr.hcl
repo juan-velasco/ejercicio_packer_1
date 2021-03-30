@@ -26,11 +26,7 @@ build {
     provisioner "shell" {
       inline = [
         "set -e #aborta el comando en caso de error",
-        "sudo apt-get update -y",
-        "sudo apt-get install software-properties-common -y",
-        "sudo apt-add-repository ppa:ansible/ansible -y",
-        "sudo apt-get update -y",
-        "sudo DEBIAN_FRONTEND=noninteractive apt-get install ansible -y"
+        "sudo timedatectl set-timezone Europe/Madrid"
       ]
     }
 
