@@ -149,7 +149,7 @@
   become: no
   tasks:
     - name: Create project using Composer      
-      shell: composer create-project symfony/symfony-demo my_site --no-interaction
+      shell: composer create-project symfony/symfony-demo=1.8.0 my_site --no-interaction
       args:
         chdir: /srv
 -
